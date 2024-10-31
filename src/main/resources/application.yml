@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: racetrack
+
+server:
+  port: 8081
+
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/
