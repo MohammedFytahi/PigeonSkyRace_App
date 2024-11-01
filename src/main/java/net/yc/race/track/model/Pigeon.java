@@ -14,4 +14,5 @@ public class Pigeon {
     private long numeroDeBadge;
     private int age;
     private String couleur;
+    private Competition competition;
 }
