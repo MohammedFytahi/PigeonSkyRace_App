@@ -23,7 +23,7 @@ public class SeasonController {
     @GetMapping
     public List<Season> findSeasons(){return seasonService.findSeasons();}
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteSeason(@PathVariable Integer id) {
+    public ResponseEntity<String> deleteSeason(@PathVariable String id) {
         String result = seasonService.deleteSeasonById(id);
         if ("Season supprimé avec succès.".equals(result)) {
             return ResponseEntity.ok(result);

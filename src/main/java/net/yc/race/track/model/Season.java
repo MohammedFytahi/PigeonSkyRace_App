@@ -1,17 +1,16 @@
 package net.yc.race.track.model;
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import net.yc.race.track.Enum.Status;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "saison")
-@Getter @Setter
+@Document(collection = "season")
+@Data
 @NoArgsConstructor
 public class Season {
     @Id
-    private int id;
+    private String seasonId;  // Utilisation de String pour les identifiants MongoDB
     private Status status;
 }

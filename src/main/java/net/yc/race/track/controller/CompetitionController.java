@@ -16,14 +16,17 @@ public class CompetitionController {
     private CompetitionService competitionService;
 
     @PostMapping("/add")
-    public Competition createCompetition(@RequestBody Competition competition) {
-        return competitionService.saveCompetition(competition);
+    public ResponseEntity<String> createCompetition(@RequestBody Competition competition) {
+        String seasonId = competition.getSeasonId();
+        String result = competitionService.saveCompetition(competition, seasonId);
+        return ResponseEntity.ok(result);
     }
+
 
     @GetMapping
     public List<Competition> findCompetitions(){return competitionService.findCompetitions();}
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteCompetition(@PathVariable Integer id) {
+    public ResponseEntity<String> deleteCompetition(@PathVariable String id) {
         String result = competitionService.deleteCompetitionById(id);
         if ("Competition supprimé avec succès.".equals(result)) {
             return ResponseEntity.ok(result);

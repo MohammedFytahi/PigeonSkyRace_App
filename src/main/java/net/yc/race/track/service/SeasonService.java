@@ -23,7 +23,7 @@ public class SeasonService {
         return seasonRepository.findAll();
     }
 
-    public String deleteSeasonById(Integer id) {
+    public String deleteSeasonById(String id) {
         if (seasonRepository.existsById(id)) {
             seasonRepository.deleteById(id);
             return "Season supprimé avec succès.";
