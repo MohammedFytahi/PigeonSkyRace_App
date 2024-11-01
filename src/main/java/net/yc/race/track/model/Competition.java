@@ -22,5 +22,5 @@ public class Competition {
     private double distance;
     private Date startDateTime;
     private Date delayDuration;
-    private Pigeon pigeon;
+    private Pigeon pigeon;  // Keep this line if needed
 }

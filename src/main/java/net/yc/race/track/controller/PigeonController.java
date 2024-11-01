@@ -16,8 +16,10 @@ public class PigeonController {
     private PigeonService pigeonService;
 
     @PostMapping("/add")
-    public Pigeon createPigeon(@RequestBody Pigeon pigeon) {
-        return pigeonService.savePigeon(pigeon);
+    public ResponseEntity<String>createPigeon(@RequestBody Pigeon pigeon) {
+        String user_id = pigeon.getUser_id();
+        String result =  pigeonService.savePigeon(pigeon,user_id);
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping

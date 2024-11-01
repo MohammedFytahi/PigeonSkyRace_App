@@ -11,6 +11,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 public class Season {
     @Id
-    private String seasonId;  // Utilisation de String pour les identifiants MongoDB
+    private String seasonId;
     private Status status;
 }

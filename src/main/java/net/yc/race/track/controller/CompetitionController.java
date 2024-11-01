@@ -42,7 +42,7 @@ public class CompetitionController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteCompetition(@PathVariable String id) {
         String result = competitionService.deleteCompetitionById(id);
-        if ("Competition supprimé avec succès.".equals(result)) {
+            if ("Competition supprimé avec succès.".equals(result)) {
             return ResponseEntity.ok(result);
         } else {
             return ResponseEntity.status(404).body(result);
