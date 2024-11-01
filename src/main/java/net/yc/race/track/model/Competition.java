@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Persistent;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
@@ -14,11 +15,12 @@ import java.util.Date;
 @NoArgsConstructor
 public class Competition {
     @Id
-    private String id;  // Utilisation de String pour les identifiants MongoDB
-    private String seasonId;  // Changement de type pour correspondre à la saison
+    private String id;
+    private String seasonId;
     private String courseName;
     private String coordinatesGPS;
-    private double distance;  // Utiliser double pour les valeurs numériques
+    private double distance;
     private Date startDateTime;
-    private Date delayDuration;  // Renommé pour clarifier la signification
+    private Date delayDuration;
+    private Pigeon pigeon;
 }
