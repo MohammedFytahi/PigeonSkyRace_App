@@ -38,7 +38,7 @@ public class CompetitionService {
             return "La competition et deja commencée ou completé . Impossible d'enregistrer le pigeon.";
         } else {
 
-            competition.setPigeon(pigeon);
+            competition.setPigeon((List<Pigeon>) pigeon);
             competitionRepository.save(competition);
             return "Pigeon enregistrée avec succès.";
         }

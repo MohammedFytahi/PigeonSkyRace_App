@@ -4,10 +4,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Persistent;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
+import java.util.List;
 
 @Document(collection = "competition")
 @Getter
@@ -22,5 +22,5 @@ public class Competition {
     private double distance;
     private Date startDateTime;
     private Date delayDuration;
-    private Pigeon pigeon;  // Keep this line if needed
+    private List<Pigeon> pigeon; // Modifier pour accepter une liste de pigeons
 }

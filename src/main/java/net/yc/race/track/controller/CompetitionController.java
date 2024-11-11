@@ -30,12 +30,17 @@ public class CompetitionController {
 
         Optional<Competition> competitionOpt = competitionService.findCompetitionById(competitionId);
         if (competitionOpt.isPresent()) {
-            String result = competitionService.updatePigeonToCompetition(competitionOpt.get(), pigeon);
-            return ResponseEntity.ok(result);
+            Competition competition = competitionOpt.get();
+            competition.getPigeon().add(pigeon);
+            competitionService.saveCompetition(competition, competition.getSeasonId());
+            return ResponseEntity.ok("Pigeon ajouté à la compétition.");
         } else {
             return ResponseEntity.status(404).body("Competition not found.");
         }
     }
+
+
+
 
     @GetMapping
     public List<Competition> findCompetitions(){return competitionService.findCompetitions();}
