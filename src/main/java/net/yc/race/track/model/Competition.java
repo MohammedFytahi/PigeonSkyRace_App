@@ -22,5 +22,5 @@ public class Competition {
     private double distance;
     private Date startDateTime;
     private Date delayDuration;
-    private List<Pigeon> pigeon; // Modifier pour accepter une liste de pigeons
+    private List<Pigeon> pigeon;
 }
