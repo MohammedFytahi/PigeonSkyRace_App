@@ -10,6 +10,7 @@ import net.yc.race.track.repository.CompetitionRepository;
 import net.yc.race.track.repository.ResultRepository;
 import net.yc.race.track.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -29,9 +30,40 @@ public class ResultService {
         @Autowired
         private UserRepository userRepository;
 
-    public List<Result> showResult(String competitionId){
-       return resultRepository.findAllByCompetitionId(competitionId);
+
+    public List<Result> showResult(String competitionId) {
+        // Fetch all results, sorted by speed in descending order
+        List<Result> results = resultRepository.findAllByCompetitionId(
+                competitionId, Sort.by(Sort.Order.desc("speed"))
+        );
+
+        // Calculate the number of players to return (top 25%)
+        int totalPlayers = results.size();
+        int top25PercentCount = (int) Math.ceil(totalPlayers * 0.25); // Round up to ensure at least one player
+
+        // Get the top 25% results
+        List<Result> topResults = results.subList(0, Math.min(top25PercentCount, totalPlayers));
+
+        // Set initial points for the top rank and calculate points difference
+        double topPoints = 100.0;
+        double pointDifference = topPoints / (topResults.size() - 1.0); // Avoid zero difference if only one player
+
+        for (int i = 0; i < topResults.size(); i++) {
+            // Assign rank
+            Result result = topResults.get(i);
+            int rank = i + 1;
+            result.setRank(rank);
+
+            // Calculate points based on rank
+            double points = topPoints - (rank - 1) * pointDifference;
+            result.setPoint(Math.max(points, 0)); // Ensure points don't go negative
+        }
+
+        return topResults;
     }
+
+
+
     public String saveResult(Result result) {
         Optional<Competition> competitionOpt = competitionRepository.findById(result.getCompetitionId());
         Optional<User> userOpt = userRepository.findByLoftName(result.getLoftName());
@@ -56,12 +88,14 @@ public class ResultService {
                     competition.getCoordinatesGPS(),
                     user.getGpsCoordinates()
             );
-            result.setDistance(distance);
+             result.setDistance(distance);
 
-            // Calculate speed
+            // Calculate elapsed time in minutes
             Date arriveHour = result.getArriveHour();
-            long timeElapsed = Duration.between(startTime, arriveHour.toInstant()).toHours();
-            result.setSpeed(timeElapsed > 0 ? distance / timeElapsed : 0);
+            long timeElapsedMinutes = Duration.between(startTime, arriveHour.toInstant()).toMinutes();
+
+            // Calculate speed in m/min
+            result.setSpeed(timeElapsedMinutes > 0 ? distance*1000 / timeElapsedMinutes : 0);
 
             // Save result
             resultRepository.save(result);
