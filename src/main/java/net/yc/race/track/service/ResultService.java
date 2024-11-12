@@ -1,5 +1,7 @@
 package net.yc.race.track.service;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 import net.yc.race.track.model.Competition;
 import net.yc.race.track.model.Result;
@@ -27,6 +29,9 @@ public class ResultService {
         @Autowired
         private UserRepository userRepository;
 
+    public List<Result> showResult(String competitionId){
+       return resultRepository.findAllByCompetitionId(competitionId);
+    }
     public String saveResult(Result result) {
         Optional<Competition> competitionOpt = competitionRepository.findById(result.getCompetitionId());
         Optional<User> userOpt = userRepository.findByLoftName(result.getLoftName());
@@ -35,25 +40,30 @@ public class ResultService {
             Competition competition = competitionOpt.get();
             User user = userOpt.get();
 
+            // Calculate competition end time by adding delay to start time
+            Instant startTime = competition.getStartDateTime().toInstant();
+            Instant delayDuration = competition.getDelayDuration().toInstant();
+            Instant endTime = startTime.plus(delayDuration.toEpochMilli(), ChronoUnit.MILLIS);
+
+            // Check if the current time is after the end time
+            Instant now = Instant.now();
+            if (now.isAfter(endTime)) {
+                return "The competition delay duration has already passed. Result cannot be added.";
+            }
+
+            // Calculate distance using GPS coordinates
             double distance = calculateDistance(
                     competition.getCoordinatesGPS(),
                     user.getGpsCoordinates()
             );
-
             result.setDistance(distance);
 
+            // Calculate speed
             Date arriveHour = result.getArriveHour();
-            Date startDateTime = competition.getStartDateTime();
-            long timeElapsed = Duration.between(startDateTime.toInstant(), arriveHour.toInstant()).toHours();
+            long timeElapsed = Duration.between(startTime, arriveHour.toInstant()).toHours();
+            result.setSpeed(timeElapsed > 0 ? distance / timeElapsed : 0);
 
-            if (timeElapsed > 0) {
-                double speed = distance / timeElapsed;
-                result.setSpeed(speed);
-            } else {
-                result.setSpeed(0);
-            }
-
-
+            // Save result
             resultRepository.save(result);
             return "Result enregistré avec succès.";
         } else {

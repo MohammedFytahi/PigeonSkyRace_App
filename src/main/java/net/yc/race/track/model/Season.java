@@ -8,7 +8,7 @@ import net.yc.race.track.Enum.Status;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "season")
+@Document(collection = "seasons")
 @Data
 @NoArgsConstructor
 @Getter

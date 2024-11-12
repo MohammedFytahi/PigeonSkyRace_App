@@ -11,6 +11,7 @@ import java.util.Date;
 @NoArgsConstructor
 public class Result {
     @Id
+    private int id;
     private int rank;
     private String loftName;
     private String numeroDeBadge;
@@ -19,6 +20,5 @@ public class Result {
     private double speed;
     private double point;
     private String competitionId;
-
 
 }
