@@ -30,12 +30,13 @@ public class AuthController {
 
         Optional<User> user = userService.authenticate(username, password);
 
-        if (user != null) {
+        if (user.isPresent()) {
             return ResponseEntity.ok("Login successful");
         } else {
             return ResponseEntity.status(401).body("Invalid username or password");
         }
     }
+
 
 
 }
