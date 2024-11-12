@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.Date;
 import java.util.List;
 
-@Document(collection = "competition")
+@Document(collection = "competitions")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,8 +19,7 @@ public class Competition {
     private String seasonId;
     private String courseName;
     private String coordinatesGPS;
-    private double distance;
     private Date startDateTime;
     private Date delayDuration;
-    private List<Pigeon> pigeon; // Modifier pour accepter une liste de pigeons
+    private List<Pigeon> pigeon;
 }

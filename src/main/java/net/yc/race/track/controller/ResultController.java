@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/results")
@@ -27,8 +28,15 @@ public class ResultController {
     }
 
 
-    @GetMapping
-    public List<Result> findResults(){return resultService.findResults();}
+    @GetMapping("/show/{competitionId}")
+    public ResponseEntity<List<Result>> showResults(@PathVariable String competitionId) {
+        List<Result> results = resultService.showResult(competitionId);
+        if (results.isEmpty()) {
+            return ResponseEntity.status(404).body(null);
+        } else {
+            return ResponseEntity.ok(results);
+        }
+    }
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteResult(@PathVariable Integer id) {
         String result = resultService.deleteResultById(id);
