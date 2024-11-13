@@ -59,8 +59,12 @@ public class ResultService {
             result.setPoint(Math.max(points, 0)); // Ensure points don't go negative
         }
 
+        // Save updated top 25% results to the database
+        resultRepository.saveAll(topResults);
+
         return topResults;
     }
+
 
 
 

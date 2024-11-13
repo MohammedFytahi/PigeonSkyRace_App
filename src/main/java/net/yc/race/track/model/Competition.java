@@ -19,6 +19,7 @@ public class Competition {
     private String seasonId;
     private String courseName;
     private String coordinatesGPS;
+    private Long distance;
     private Date startDateTime;
     private Date delayDuration;
     private List<Pigeon> pigeon;
