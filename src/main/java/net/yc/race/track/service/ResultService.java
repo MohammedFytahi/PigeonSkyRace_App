@@ -46,7 +46,7 @@ public class ResultService {
 
         // Set initial points for the top rank and calculate points difference
         double topPoints = 100.0;
-        double pointDifference = topPoints / (topResults.size() - 1.0); // Avoid zero difference if only one player
+        double pointDifference = (topResults.size() > 1) ? topPoints / (topResults.size() - 1.0) : 0; // Avoid zero difference if only one player
 
         for (int i = 0; i < topResults.size(); i++) {
             // Assign rank
@@ -76,6 +76,9 @@ public class ResultService {
             Competition competition = competitionOpt.get();
             User user = userOpt.get();
 
+            if (competition.getCoordinatesGPS() == null || user.getGpsCoordinates() == null) {
+                return "GPS coordinates for competition or user are missing.";
+            }
             // Calculate competition end time by adding delay to start time
             Instant startTime = competition.getStartDateTime().toInstant();
             Instant delayDuration = competition.getDelayDuration().toInstant();
@@ -109,7 +112,7 @@ public class ResultService {
         }
     }
 
-    private double calculateDistance(String gps1, String gps2) {
+    public double calculateDistance(String gps1, String gps2) {
         String[] coordinates1 = gps1.split(",");
         String[] coordinates2 = gps2.split(",");
 
