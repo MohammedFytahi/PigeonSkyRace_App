@@ -1,4 +1,5 @@
 package net.yc.race.track.model;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -9,6 +10,7 @@ import java.util.Date;
 @Document(collection = "results")
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class Result {
     @Id
     private int id;

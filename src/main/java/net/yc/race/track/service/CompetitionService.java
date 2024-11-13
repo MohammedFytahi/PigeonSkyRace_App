@@ -4,8 +4,10 @@ import net.yc.race.track.Enum.Status;
 import net.yc.race.track.model.Competition;
 import net.yc.race.track.model.Pigeon;
 import net.yc.race.track.model.Season;
+import net.yc.race.track.model.User;
 import net.yc.race.track.repository.CompetitionRepository;
 import net.yc.race.track.repository.SeasonRepository;
+import net.yc.race.track.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,15 +22,56 @@ public class CompetitionService {
     private CompetitionRepository competitionRepository;
     @Autowired
     private SeasonRepository seasonRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     public String saveCompetition(Competition competition, String seasonId) {
         Optional<Season> seasonOpt = seasonRepository.findById(seasonId);
+
+        // Check if there is at least one pigeon
+        if (competition.getPigeon().isEmpty()) {
+            return "No pigeon found for the competition.";
+        }
+
+        Pigeon firstPigeon = competition.getPigeon().getFirst(); // Get the first pigeon
+        Optional<User> userOpt = userRepository.findById(firstPigeon.getUser_id());
+
         if (seasonOpt.isPresent() && seasonOpt.get().getStatus() == Status.DONE) {
             return "La saison n'est pas active. Impossible d'enregistrer la compétition.";
+        } else if (userOpt.isPresent()) {
+            double distance = calculateDistance(competition.getCoordinatesGPS(), userOpt.get().getGpsCoordinates());
+
+            if (Math.abs(competition.getDistance() - distance) <= 5) {
+                competitionRepository.save(competition);
+                return "Compétition enregistrée avec succès.";
+            } else {
+                return "Competition is out of your range.";
+            }
         } else {
-            competitionRepository.save(competition);
-            return "Compétition enregistrée avec succès.";
+            return "User not found.";
         }
+    }
+
+
+    private double calculateDistance(String gps1, String gps2) {
+        String[] coordinates1 = gps1.split(",");
+        String[] coordinates2 = gps2.split(",");
+
+        double lat1 = Math.toRadians(Double.parseDouble(coordinates1[0]));
+        double lon1 = Math.toRadians(Double.parseDouble(coordinates1[1]));
+        double lat2 = Math.toRadians(Double.parseDouble(coordinates2[0]));
+        double lon2 = Math.toRadians(Double.parseDouble(coordinates2[1]));
+
+        final int EARTH_RADIUS = 6371;
+
+        double dLat = lat2 - lat1;
+        double dLon = lon2 - lon1;
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1) * Math.cos(lat2) *
+                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return EARTH_RADIUS * c;
     }
     public String updatePigeonToCompetition(Competition competition, Pigeon pigeon) {
 
