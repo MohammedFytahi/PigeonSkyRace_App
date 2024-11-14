@@ -21,14 +21,14 @@ import java.util.Optional;
 @Service
 public class ResultService {
 
-        @Autowired
-        private ResultRepository resultRepository;
+    @Autowired
+    private ResultRepository resultRepository;
 
-        @Autowired
-        private CompetitionRepository competitionRepository;
+    @Autowired
+    private CompetitionRepository competitionRepository;
 
-        @Autowired
-        private UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
 
     public List<Result> showResult(String competitionId) {
@@ -46,7 +46,7 @@ public class ResultService {
 
         // Set initial points for the top rank and calculate points difference
         double topPoints = 100.0;
-        double pointDifference = topPoints / (topResults.size() - 1.0); // Avoid zero difference if only one player
+        double pointDifference = (topResults.size() > 1) ? topPoints / (topResults.size() - 1.0) : 0; // Avoid zero difference if only one player
 
         for (int i = 0; i < topResults.size(); i++) {
             // Assign rank
@@ -59,8 +59,12 @@ public class ResultService {
             result.setPoint(Math.max(points, 0)); // Ensure points don't go negative
         }
 
+        // Save updated top 25% results to the database
+        resultRepository.saveAll(topResults);
+
         return topResults;
     }
+
 
 
 
@@ -72,6 +76,9 @@ public class ResultService {
             Competition competition = competitionOpt.get();
             User user = userOpt.get();
 
+            if (competition.getCoordinatesGPS() == null || user.getGpsCoordinates() == null) {
+                return "GPS coordinates for competition or user are missing.";
+            }
             // Calculate competition end time by adding delay to start time
             Instant startTime = competition.getStartDateTime().toInstant();
             Instant delayDuration = competition.getDelayDuration().toInstant();
@@ -88,7 +95,7 @@ public class ResultService {
                     competition.getCoordinatesGPS(),
                     user.getGpsCoordinates()
             );
-             result.setDistance(distance);
+            result.setDistance(distance);
 
             // Calculate elapsed time in minutes
             Date arriveHour = result.getArriveHour();
@@ -105,7 +112,7 @@ public class ResultService {
         }
     }
 
-    private double calculateDistance(String gps1, String gps2) {
+    public double calculateDistance(String gps1, String gps2) {
         String[] coordinates1 = gps1.split(",");
         String[] coordinates2 = gps2.split(",");
 
@@ -126,17 +133,17 @@ public class ResultService {
         return EARTH_RADIUS * c;
     }
 
-        public List<Result> findResults(){
-            return resultRepository.findAll();
-        }
+    public List<Result> findResults(){
+        return resultRepository.findAll();
+    }
 
-        public String deleteResultById(Integer id) {
-            if (resultRepository.existsById(id)) {
-                resultRepository.deleteById(id);
-                return "Result supprimé avec succès.";
-            } else {
-                return "Result non trouvé.";
-            }
+    public String deleteResultById(Integer id) {
+        if (resultRepository.existsById(id)) {
+            resultRepository.deleteById(id);
+            return "Result supprimé avec succès.";
+        } else {
+            return "Result non trouvé.";
         }
+    }
 
 }
