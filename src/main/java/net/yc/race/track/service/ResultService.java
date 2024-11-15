@@ -32,38 +32,52 @@ public class ResultService {
 
 
     public List<Result> showResult(String competitionId) {
-        // Fetch all results, sorted by speed in descending order
-        List<Result> results = resultRepository.findAllByCompetitionId(
-                competitionId, Sort.by(Sort.Order.desc("speed"))
-        );
+        // Fetch all results for the competition
+        List<Result> results = resultRepository.findAllByCompetitionId(competitionId,Sort.by(Sort.Order.desc("speed")));
 
-        // Calculate the number of players to return (top 25%)
+        // Calculate the average distance traveled by all pigeons in the competition
+        double totalDistance = results.stream()
+                .mapToDouble(Result::getDistance)
+                .sum();
+        double averageDistance = totalDistance / results.size();
+
+        // Adjust speed based on the distance coefficient
+        results.forEach(result -> {
+            double adjustmentCoefficient = averageDistance / result.getDistance();
+            double adjustedSpeed = result.getSpeed() * adjustmentCoefficient;
+            result.setAdjustedSpeed(adjustedSpeed);
+        });
+
+        // Sort results by adjusted speed in descending order
+        results.sort((r1, r2) -> Double.compare(r2.getAdjustedSpeed(), r1.getAdjustedSpeed()));
+
+        // Calculate the number of top players (top 25%)
         int totalPlayers = results.size();
-        int top25PercentCount = (int) Math.ceil(totalPlayers * 0.25); // Round up to ensure at least one player
+        int top25PercentCount = (int) Math.ceil(totalPlayers * 0.25);
 
-        // Get the top 25% results
+        // Get the top 25% results based on adjusted speed
         List<Result> topResults = results.subList(0, Math.min(top25PercentCount, totalPlayers));
 
-        // Set initial points for the top rank and calculate points difference
+        // Set initial points and calculate point difference
         double topPoints = 100.0;
-        double pointDifference = (topResults.size() > 1) ? topPoints / (topResults.size() - 1.0) : 0; // Avoid zero difference if only one player
+        double pointDifference = (topResults.size() > 1) ? topPoints / (topResults.size() - 1.0) : 0;
 
+        // Assign ranks and points to top results
         for (int i = 0; i < topResults.size(); i++) {
-            // Assign rank
             Result result = topResults.get(i);
             int rank = i + 1;
             result.setRank(rank);
 
-            // Calculate points based on rank
             double points = topPoints - (rank - 1) * pointDifference;
-            result.setPoint(Math.max(points, 0)); // Ensure points don't go negative
+            result.setPoint(Math.max(points, 0)); // Ensure points are non-negative
         }
 
-        // Save updated top 25% results to the database
-        resultRepository.saveAll(topResults);
+        // Save updated results to the database
+        resultRepository.saveAll(results);
 
         return topResults;
     }
+
 
 
 
