@@ -27,11 +27,13 @@ public class ResultService {
     @Autowired
     private CompetitionRepository competitionRepository;
 
+
     @Autowired
     private UserRepository userRepository;
 
         @Autowired
         private PdfExportService pdfExportService;
+ 
 
 
     public List<Result> showResult(String competitionId) {
@@ -154,6 +156,7 @@ public class ResultService {
         return resultRepository.findAll();
     }
 
+
     public String deleteResultById(Integer id) {
         if (resultRepository.existsById(id)) {
             resultRepository.deleteById(id);
@@ -178,7 +181,9 @@ public class ResultService {
 
         if (filteredResults.isEmpty()) {
             return "Aucun résultat valide (rang > 0) trouvé pour la compétition avec l'ID : " + competitionId;
+
         }
+    }
 
         try {
             // Call the PDF export service to generate the PDF

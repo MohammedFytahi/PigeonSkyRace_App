@@ -47,10 +47,12 @@ class ResultServiceTest {
         // Arrange: create mock data
         String competitionId = "competition1";
 
+
         Result result1 = new Result(1, 0, "Loft A", "badge1", new Date(), 100.0, 80.0,0.0,1.2, competitionId);
         Result result2 = new Result(2, 0, "Loft B", "badge2", new Date(), 150.0, 90.0, 0.0,1.2, competitionId);
         Result result3 = new Result(3, 0, "Loft C", "badge3", new Date(), 120.0, 85.0, 0.0,1.2, competitionId);
         Result result4 = new Result(4, 0, "Loft D", "badge4", new Date(), 130.0, 70.0, 0.0, 1.2,competitionId);
+
         List<Result> allResults = new ArrayList<>();
         allResults.add(result1);
         allResults.add(result2);
@@ -109,7 +111,9 @@ class ResultServiceTest {
     void showResult_ShouldHandleSingleResult() {
         // Arrange: only one result
         String competitionId = "competition3";
+
         Result result1 = new Result(1, 0, "Loft A", "badge1", new Date(), 100.0, 80.0, 0.0, 1.2,competitionId);
+
 
         List<Result> allResults = new ArrayList<>();
         allResults.add(result1);
@@ -257,4 +261,6 @@ class ResultServiceTest {
         // Expected distance between Sydney and Tokyo is approximately 7,812 km
         assertEquals(7812, distance, 20.0); // Allowing a 20 km tolerance
     }
+
+}
 

@@ -25,5 +25,5 @@ public class Competition {
     private Date startDateTime;
     private Date delayDuration;
     private List<Integer> pigeonId;
+ 
 }
-
