@@ -8,6 +8,7 @@ import java.util.Optional;
 
 @Repository
 public interface PigeonRepository extends MongoRepository<Pigeon, Integer> {
+    int getPointsForPigeon(int pigeonId);
 
 
     boolean existsByNumeroDeBadge(String generatedBadge);
