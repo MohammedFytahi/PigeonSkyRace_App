@@ -11,4 +11,6 @@ import java.util.List;
 @Repository
 public interface ResultRepository extends MongoRepository<Result, Integer> {
     List<Result> findAllByCompetitionId(String competitionId, Sort sort);
+    int getPointsForPigeon(int pigeonId);
+
 }

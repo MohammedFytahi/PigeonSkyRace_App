@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 public class SeasonService {
 
     @Autowired
+    private ResultRepository resultRepository;
+    @Autowired
     private SeasonRepository seasonRepository;
     @Autowired
     private CompetitionRepository competitionRepository;
