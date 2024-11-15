@@ -21,6 +21,7 @@ public class Result {
     private double distance;
     private double speed;
     private double point;
+    private double adjustedSpeed;
     private String competitionId;
 
 }
