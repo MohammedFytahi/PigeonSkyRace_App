@@ -46,6 +46,7 @@ class ResultServiceTest {
     void showResult_ShouldReturnTop25PercentResults() {
         // Arrange: create mock data
         String competitionId = "competition1";
+
         Result result1 = new Result(1, 0, "Loft A", "badge1", new Date(), 100.0, 80.0,0.0,1.2, competitionId);
         Result result2 = new Result(2, 0, "Loft B", "badge2", new Date(), 150.0, 90.0, 0.0,1.2, competitionId);
         Result result3 = new Result(3, 0, "Loft C", "badge3", new Date(), 120.0, 85.0, 0.0,1.2, competitionId);
@@ -56,11 +57,13 @@ class ResultServiceTest {
         allResults.add(result3);
         allResults.add(result4);
 
+
         // Mock the repository call
         when(resultRepository.findAllByCompetitionId(eq(competitionId), any(Sort.class))).thenReturn(allResults);
 
         // Act: call the method under test
         List<Result> topResults = resultService.showResult(competitionId);
+
 
         // Assert: verify the results
         assertNotNull(topResults);
@@ -70,10 +73,12 @@ class ResultServiceTest {
         assertEquals(1, topResults.get(0).getRank());
         assertEquals(100.0, topResults.get(0).getPoint());
 
+
         // Ensure that points decrease with rank
         if (topResults.size() > 1) {
             assertTrue(topResults.get(0).getPoint() > topResults.get(1).getPoint());
         }
+
 
         // Verify interactions with the repository
         verify(resultRepository, times(1)).findAllByCompetitionId(eq(competitionId), any(Sort.class));
@@ -105,6 +110,7 @@ class ResultServiceTest {
         // Arrange: only one result
         String competitionId = "competition3";
         Result result1 = new Result(1, 0, "Loft A", "badge1", new Date(), 100.0, 80.0, 0.0, 1.2,competitionId);
+
         List<Result> allResults = new ArrayList<>();
         allResults.add(result1);
 
@@ -251,4 +257,4 @@ class ResultServiceTest {
         // Expected distance between Sydney and Tokyo is approximately 7,812 km
         assertEquals(7812, distance, 20.0); // Allowing a 20 km tolerance
     }
-}
+

@@ -21,14 +21,14 @@ import java.util.Optional;
 @Service
 public class ResultService {
 
-        @Autowired
-        private ResultRepository resultRepository;
+    @Autowired
+    private ResultRepository resultRepository;
 
-        @Autowired
-        private CompetitionRepository competitionRepository;
+    @Autowired
+    private CompetitionRepository competitionRepository;
 
-        @Autowired
-        private UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
 
     public List<Result> showResult(String competitionId) {
@@ -109,7 +109,7 @@ public class ResultService {
                     competition.getCoordinatesGPS(),
                     user.getGpsCoordinates()
             );
-             result.setDistance(distance);
+            result.setDistance(distance);
 
             // Calculate elapsed time in minutes
             Date arriveHour = result.getArriveHour();
@@ -147,17 +147,17 @@ public class ResultService {
         return EARTH_RADIUS * c;
     }
 
-        public List<Result> findResults(){
-            return resultRepository.findAll();
-        }
+    public List<Result> findResults(){
+        return resultRepository.findAll();
+    }
 
-        public String deleteResultById(Integer id) {
-            if (resultRepository.existsById(id)) {
-                resultRepository.deleteById(id);
-                return "Result supprimé avec succès.";
-            } else {
-                return "Result non trouvé.";
-            }
+    public String deleteResultById(Integer id) {
+        if (resultRepository.existsById(id)) {
+            resultRepository.deleteById(id);
+            return "Result supprimé avec succès.";
+        } else {
+            return "Result non trouvé.";
         }
+    }
 
 }
