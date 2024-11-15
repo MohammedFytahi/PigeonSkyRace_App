@@ -27,6 +27,12 @@ public class ResultController {
         }
     }
 
+    @GetMapping("/export/{competitionId}")
+    public ResponseEntity<String> exportResults(@PathVariable String competitionId) {
+        String outputPath = "C:/temp/results.pdf";  // Choisissez le chemin d'enregistrement
+        String message = resultService.exportResultsToPdf(competitionId, outputPath);
+        return ResponseEntity.ok(message);
+    }
 
     @GetMapping("/show/{competitionId}")
     public ResponseEntity<List<Result>> showResults(@PathVariable String competitionId) {

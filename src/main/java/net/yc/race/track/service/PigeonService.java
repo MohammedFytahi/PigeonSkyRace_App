@@ -20,26 +20,24 @@ public class PigeonService {
     @Autowired
     private UserRepository userRepository;
 
-    public String savePigeon(Pigeon pigeon, String user_id) {
-        Optional<User> userOpt = userRepository.findById(user_id);
-
-        if (userOpt.isPresent()) {
-            String generatedBadge = generateUniqueBadge(pigeon);
-
-            // Check if a pigeon with this badge number already exists
-            while (pigeonRepository.existsByNumeroDeBadge(generatedBadge)) {
-                // Modify the generated badge slightly to ensure uniqueness if a duplicate is found
-                generatedBadge = generateUniqueBadge(pigeon);
-            }
-
-            pigeon.setNumeroDeBadge(generatedBadge);
-            pigeon.setUser_id(user_id);
-            pigeonRepository.save(pigeon);
-            return "Pigeon enregistré avec succès avec le numéro de bague: " + generatedBadge;
-        } else {
+    public String savePigeon(Pigeon pigeon, String userId) {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
             return "Utilisateur non trouvé";
         }
+
+        if (pigeon.getCouleur() == null || pigeon.getCouleur().length() < 2) {
+            return "Couleur invalide pour le pigeon.";
+        }
+
+        String badge = generateUniqueBadge(pigeon);
+        pigeon.setNumeroDeBadge(badge);
+
+        pigeonRepository.save(pigeon);
+        return "Pigeon enregistré avec succès.";
     }
+
+
 
     public Optional<Pigeon> findPigeonById(Integer pigeonId){
         return pigeonRepository.findById(pigeonId);
@@ -47,10 +45,11 @@ public class PigeonService {
 
     // Helper method to generate a unique badge based on color and age
     private String generateUniqueBadge(Pigeon pigeon) {
-        // Combine color, age, and a random number or timestamp to ensure uniqueness
-        return pigeon.getCouleur().substring(0, 2).toUpperCase() // Color prefix (first 2 letters)
-                + pigeon.getAge() // Age as part of badge
-                + System.currentTimeMillis() % 1000; // Last 3 digits of timestamp for uniqueness
+        String couleur = pigeon.getCouleur();
+        if (couleur == null || couleur.length() < 2) {
+            throw new IllegalArgumentException("Couleur must be at least 2 characters.");
+        }
+        return couleur.substring(0, 2).toUpperCase() + System.currentTimeMillis();
     }
 
     public List<Pigeon> findPigeons(){

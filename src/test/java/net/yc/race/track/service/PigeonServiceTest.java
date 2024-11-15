@@ -34,37 +34,18 @@ class PigeonServiceTest {
     }
 
     @Test
-    void savePigeon_UserExists_ShouldSavePigeon() {
-
-        String userId = "1";
-        Pigeon pigeon = new Pigeon();
-        User user = new User();
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(pigeonRepository.save(pigeon)).thenReturn(pigeon);
-
-
-        String result = pigeonService.savePigeon(pigeon, userId);
-
-
-        assertEquals("pigeon enregistrée avec succès.", result);
-        verify(userRepository, times(1)).findById(userId);
-        verify(pigeonRepository, times(1)).save(pigeon);
-    }
-
-    @Test
     void savePigeon_UserDoesNotExist_ShouldReturnUserNotFound() {
-
         String userId = "2";
         Pigeon pigeon = new Pigeon();
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-
         String result = pigeonService.savePigeon(pigeon, userId);
 
-        assertEquals("User not found", result);
+        assertEquals("Utilisateur non trouvé", result);
         verify(userRepository, times(1)).findById(userId);
         verify(pigeonRepository, never()).save(pigeon);
     }
+
 
 
 
@@ -88,6 +69,21 @@ class PigeonServiceTest {
 
         assertEquals(2, result.size());
         assertEquals(pigeons, result);
+    }
+    @Test
+    void savePigeon_InvalidCouleur_ShouldReturnErrorMessage() {
+        String userId = "1";
+        Pigeon pigeon = new Pigeon();
+        pigeon.setCouleur(null);
+
+        User user = new User();
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        String result = pigeonService.savePigeon(pigeon, userId);
+
+        assertEquals("Couleur invalide pour le pigeon.", result);
+        verify(userRepository, times(1)).findById(userId);
+        verify(pigeonRepository, never()).save(pigeon);
     }
 
     @Test
@@ -117,4 +113,22 @@ class PigeonServiceTest {
         assertEquals("Pigeon non trouvé.", result);
         verify(pigeonRepository, never()).deleteById(pigeonId);
     }
+
+    @Test
+    void savePigeon_UserExists_ShouldSavePigeon() {
+        String userId = "1";
+        Pigeon pigeon = new Pigeon();
+        pigeon.setCouleur("Bleu"); // Ensure a valid couleur is set
+
+        User user = new User();
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(pigeonRepository.save(pigeon)).thenReturn(pigeon);
+
+        String result = pigeonService.savePigeon(pigeon, userId);
+
+        assertEquals("Pigeon enregistré avec succès.", result);
+        verify(userRepository, times(1)).findById(userId);
+        verify(pigeonRepository, times(1)).save(pigeon);
+    }
+
 }

@@ -30,6 +30,9 @@ public class ResultService {
     @Autowired
     private UserRepository userRepository;
 
+        @Autowired
+        private PdfExportService pdfExportService;
+
 
     public List<Result> showResult(String competitionId) {
         // Fetch all results for the competition
@@ -60,7 +63,7 @@ public class ResultService {
 
         // Set initial points and calculate point difference
         double topPoints = 100.0;
-        double pointDifference = (topResults.size() > 1) ? topPoints / (topResults.size() - 1.0) : 0;
+        double pointDifference = (topResults.size() > 1) ? topPoints / (topResults.size()) : 0;
 
         // Assign ranks and points to top results
         for (int i = 0; i < topResults.size(); i++) {
@@ -159,5 +162,32 @@ public class ResultService {
             return "Result non trouvé.";
         }
     }
+
+    public String exportResultsToPdf(String competitionId, String outputPath) {
+        // Fetch competition results, sorted by speed in descending order
+        List<Result> results = resultRepository.findAllByCompetitionId(competitionId, Sort.by(Sort.Order.desc("speed")));
+
+        if (results == null || results.isEmpty()) {
+            return "Aucun résultat trouvé pour la compétition avec l'ID : " + competitionId;
+        }
+
+        // Filter out results with rank = 0
+        List<Result> filteredResults = results.stream()
+                .filter(result -> result.getRank() > 0)
+                .toList();
+
+        if (filteredResults.isEmpty()) {
+            return "Aucun résultat valide (rang > 0) trouvé pour la compétition avec l'ID : " + competitionId;
+        }
+
+        try {
+            // Call the PDF export service to generate the PDF
+            pdfExportService.exportResultsToPdf(filteredResults, outputPath);
+            return "Résultats exportés avec succès vers " + outputPath;
+        } catch (Exception e) {
+            return "Erreur lors de l'exportation des résultats : " + e.getMessage();
+        }
+    }
+
 
 }
