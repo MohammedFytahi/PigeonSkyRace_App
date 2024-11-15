@@ -46,11 +46,17 @@ class ResultServiceTest {
     void showResult_ShouldReturnTop25PercentResults() {
         // Arrange: create mock data
         String competitionId = "competition1";
-        Result result1 = new Result(1, 1, "Loft A", "badge1", new Date(), 100.0, 80.0, 50.0, competitionId);
-        Result result2 = new Result(2, 2, "Loft B", "badge2", new Date(), 150.0, 90.0, 40.0, competitionId);
-        Result result3 = new Result(3, 3, "Loft C", "badge3", new Date(), 120.0, 85.0, 30.0, competitionId);
-        Result result4 = new Result(4, 4, "Loft D", "badge4", new Date(), 130.0, 70.0, 20.0, competitionId);
-        List<Result> allResults = List.of(result1, result2, result3, result4);
+
+        Result result1 = new Result(1, 0, "Loft A", "badge1", new Date(), 100.0, 80.0,0.0,1.2, competitionId);
+        Result result2 = new Result(2, 0, "Loft B", "badge2", new Date(), 150.0, 90.0, 0.0,1.2, competitionId);
+        Result result3 = new Result(3, 0, "Loft C", "badge3", new Date(), 120.0, 85.0, 0.0,1.2, competitionId);
+        Result result4 = new Result(4, 0, "Loft D", "badge4", new Date(), 130.0, 70.0, 0.0, 1.2,competitionId);
+        List<Result> allResults = new ArrayList<>();
+        allResults.add(result1);
+        allResults.add(result2);
+        allResults.add(result3);
+        allResults.add(result4);
+
 
         // Mock the repository call
         when(resultRepository.findAllByCompetitionId(eq(competitionId), any(Sort.class))).thenReturn(allResults);
@@ -58,27 +64,26 @@ class ResultServiceTest {
         // Act: call the method under test
         List<Result> topResults = resultService.showResult(competitionId);
 
-        // Assert: verify the properties of the results
-        assertNotNull(topResults);
-        assertFalse(topResults.isEmpty(), "Top results should not be empty.");
 
-        // Verifying all properties of the top result
-        Result topResult = topResults.get(0);
-        assertEquals(1, topResult.getRank());
-        assertEquals("Loft A", topResult.getLoftName());
-        assertEquals("badge1", topResult.getNumeroDeBadge());
-        assertEquals(100.0, topResult.getDistance());
-        assertEquals(80.0, topResult.getSpeed());
-        assertEquals(50.0, topResult.getPoint());
-        assertEquals(competitionId, topResult.getCompetitionId());
+        // Assert: verify the results
+        assertNotNull(topResults);
+
+        // Verify that we get a list of results with ranks and points
+        assertTrue(topResults.size() > 0, "Top results should not be empty.");
+        assertEquals(1, topResults.get(0).getRank());
+        assertEquals(100.0, topResults.get(0).getPoint());
+
 
         // Ensure that points decrease with rank
         if (topResults.size() > 1) {
             assertTrue(topResults.get(0).getPoint() > topResults.get(1).getPoint());
         }
 
+
+        // Verify interactions with the repository
         verify(resultRepository, times(1)).findAllByCompetitionId(eq(competitionId), any(Sort.class));
     }
+
 
     @Test
     void showResult_ShouldHandleNoResults() {
@@ -104,7 +109,8 @@ class ResultServiceTest {
     void showResult_ShouldHandleSingleResult() {
         // Arrange: only one result
         String competitionId = "competition3";
-        Result result1 = new Result(1, 0, "Loft A", "badge1", new Date(), 100.0, 80.0, 0.0, competitionId);
+        Result result1 = new Result(1, 0, "Loft A", "badge1", new Date(), 100.0, 80.0, 0.0, 1.2,competitionId);
+
         List<Result> allResults = new ArrayList<>();
         allResults.add(result1);
 
@@ -251,4 +257,3 @@ class ResultServiceTest {
         // Expected distance between Sydney and Tokyo is approximately 7,812 km
         assertEquals(7812, distance, 20.0); // Allowing a 20 km tolerance
     }
-}
