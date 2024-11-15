@@ -183,7 +183,7 @@ public class ResultService {
             return "Aucun résultat valide (rang > 0) trouvé pour la compétition avec l'ID : " + competitionId;
 
         }
-    }
+
 
         try {
             // Call the PDF export service to generate the PDF
