@@ -6,6 +6,7 @@ import net.yc.race.track.model.Pigeon;
 import net.yc.race.track.model.Season;
 import net.yc.race.track.model.User;
 import net.yc.race.track.repository.CompetitionRepository;
+import net.yc.race.track.repository.PigeonRepository;
 import net.yc.race.track.repository.SeasonRepository;
 import net.yc.race.track.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,8 @@ import java.util.Optional;
 
 @Service
 public class CompetitionService {
-
+    @Autowired
+    private PigeonRepository pigeonRepository;
     @Autowired
     private CompetitionRepository competitionRepository;
     @Autowired
@@ -28,27 +30,33 @@ public class CompetitionService {
     public String saveCompetition(Competition competition, String seasonId) {
         Optional<Season> seasonOpt = seasonRepository.findById(seasonId);
 
-        // Check if there is at least one pigeon
-        if (competition.getPigeon().isEmpty()) {
+        // Check if there is at least one pigeon ID
+        if (competition.getPigeonId().isEmpty()) {
             return "No pigeon found for the competition.";
         }
 
-        Pigeon firstPigeon = competition.getPigeon().getFirst(); // Get the first pigeon
-        Optional<User> userOpt = userRepository.findById(firstPigeon.getUser_id());
+        int firstPigeonId = competition.getPigeonId().getFirst();
+        Optional<Pigeon> firstPigeonOpt = pigeonRepository.findById(firstPigeonId);
+        if (firstPigeonOpt.isPresent()) {
+            Pigeon firstPigeon = firstPigeonOpt.get();
+            Optional<User> userOpt = userRepository.findById(firstPigeon.getUser_id());
 
-        if (seasonOpt.isPresent() && seasonOpt.get().getStatus() == Status.DONE) {
-            return "La saison n'est pas active. Impossible d'enregistrer la compétition.";
-        } else if (userOpt.isPresent()) {
-            double distance = calculateDistance(competition.getCoordinatesGPS(), userOpt.get().getGpsCoordinates());
+            if (seasonOpt.isPresent() && seasonOpt.get().getStatus() == Status.DONE) {
+                return "La saison n'est pas active. Impossible d'enregistrer la compétition.";
+            } else if (userOpt.isPresent()) {
+                double distance = calculateDistance(competition.getCoordinatesGPS(), userOpt.get().getGpsCoordinates());
 
-            if (Math.abs(competition.getDistance() - distance) <= 5) {
-                competitionRepository.save(competition);
-                return "Compétition enregistrée avec succès.";
+                if (Math.abs(competition.getDistance() - distance) <= 5) {
+                    competitionRepository.save(competition);
+                    return "Compétition enregistrée avec succès.";
+                } else {
+                    return "Competition is out of your range.";
+                }
             } else {
-                return "Competition is out of your range.";
+                return "User not found.";
             }
         } else {
-            return "User not found.";
+            return "First pigeon not found.";
         }
     }
 
@@ -73,26 +81,28 @@ public class CompetitionService {
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return EARTH_RADIUS * c;
     }
-    public String updatePigeonToCompetition(Competition competition, Pigeon pigeon) {
 
+    public String updatePigeonToCompetition(Competition competition, Integer pigeonId) {
         Date now = new Date();
 
         if (competition.getStartDateTime().compareTo(now) <= 0) {
-            return "La competition et deja commencée ou completé . Impossible d'enregistrer le pigeon.";
+            return "La competition est déjà commencée ou terminée. Impossible d'enregistrer le pigeon.";
         } else {
-
-            competition.setPigeon((List<Pigeon>) pigeon);
-            competitionRepository.save(competition);
-            return "Pigeon enregistrée avec succès.";
+            if (!competition.getPigeonId().contains(pigeonId)) {
+                competition.getPigeonId().add(pigeonId);
+                competitionRepository.save(competition);
+                return "Pigeon ajouté avec succès.";
+            } else {
+                return "Le pigeon est déjà enregistré pour cette compétition.";
+            }
         }
     }
 
-
-    public List<Competition> findCompetitions(){
+    public List<Competition> findCompetitions() {
         return competitionRepository.findAll();
     }
 
-    public Optional<Competition> findCompetitionById(String id){
+    public Optional<Competition> findCompetitionById(String id) {
         return competitionRepository.findById(id);
     }
 
