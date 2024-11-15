@@ -35,7 +35,7 @@ public class CompetitionService {
             return "No pigeon found for the competition.";
         }
 
-        int firstPigeonId = competition.getPigeonId().getFirst();
+        int firstPigeonId = competition.getPigeonId().get(0);
         Optional<Pigeon> firstPigeonOpt = pigeonRepository.findById(firstPigeonId);
         if (firstPigeonOpt.isPresent()) {
             Pigeon firstPigeon = firstPigeonOpt.get();
