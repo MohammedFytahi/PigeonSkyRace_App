@@ -28,8 +28,9 @@ public class PdfExportService {
         // Ajouter une ligne de séparation
         document.add(new Paragraph("\n"));
 
-        // Créer une table pour afficher les résultats
-        PdfPTable table = new PdfPTable(5);  // 5 colonnes : Rang, Nom, Temps, Distance, Vitesse
+
+        PdfPTable table = new PdfPTable(7);  // 5 colonnes : Rang, Nom, Temps, Distance, Vitesse
+ 
 
         // Ajouter les en-têtes
         table.addCell("Rang");
@@ -38,6 +39,10 @@ public class PdfExportService {
         table.addCell("Distance (km)");
         table.addCell("Vitesse (m/min)");
 
+        table.addCell("adjust speed");
+        table.addCell("point");
+
+
         // Ajouter les lignes de résultats
         for (Result result : results) {
             table.addCell(String.valueOf(result.getRank()));
@@ -45,6 +50,10 @@ public class PdfExportService {
             table.addCell(String.valueOf(result.getArriveHour()));
             table.addCell(String.valueOf(result.getDistance()));
             table.addCell(String.valueOf(result.getSpeed()));
+
+            table.addCell(String.valueOf(result.getAdjustedSpeed()));
+            table.addCell(String.valueOf(result.getPoint()));
+
         }
 
         // Ajouter la table au document
@@ -53,4 +62,6 @@ public class PdfExportService {
         // Fermer le document
         document.close();
     }
+
 }
+ 
